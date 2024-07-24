@@ -1,0 +1,1 @@
+export default class ScheduleException extends Error {}

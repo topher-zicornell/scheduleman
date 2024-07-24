@@ -51,5 +51,16 @@ There are some additional constraints on tasks themselves.
 * Triggering can be done via message queue (Kafka, MQ, SQS, etc), API webhook call, FaaS 
   invocation (AWS Lambda, OpenFaas, etc), or even a workflow invocation (AWS Step Functions, 
   Argo, Airflow, etc).
-* The MVP focuses only on API webhook calls.
 * The Task Pretender is a simple mock service to pretend it's doing work.
+
+## Proof of Concept
+
+To prove out the pattern described in this design, a few shortcuts and simplifications have been 
+made:
+* The PoC focuses only on API webhook calls.  Other triggering mechanisms would follow the same 
+  pattern and be subject to the same constraints. 
+* To keep this PoC self-contained, a light-weight `postgresql` instance is included.  Don't expect 
+  data to be persisted on shutdown
+* An owner id for each schedule could be useful, depending on where this would get used.  That's 
+  not included in this PoC, but is called out where it could be.
+
