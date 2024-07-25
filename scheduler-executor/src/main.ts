@@ -2,7 +2,7 @@
 import ReschedulerService from 'scheduler-common-sdk/src/services/ReschedulerService';
 import ScheduleDao from 'scheduler-common-sdk/src/services/ScheduleDao';
 import NextExecutionDao from 'scheduler-common-sdk/src/services/NextExecutionDao';
-import TaskExecutionService, {TaskExecutionServiceIoC} from './TaskExecutionService';
+import TaskExecutionService, {TaskExecutionServiceIoC} from './services/TaskExecutionService';
 import {Pool} from 'pg';
 
 const SECOND_IN_MILLIS = 1000; // Just in case it changes
@@ -20,9 +20,9 @@ class Main {
     ioc.scheduleDao = new ScheduleDao(ioc);
     ioc.nextExecutionDao = new NextExecutionDao(ioc);
 
-    this.sleepMillis = Number(process.env.MAX_SLEEP_SECONDS || '10') * SECOND_IN_MILLIS;
-
     this.taskExecutionService = new TaskExecutionService(ioc);
+
+    this.sleepMillis = this.taskExecutionService.toleranceMillis;
   }
 
   async nap(min: number, max: number) {

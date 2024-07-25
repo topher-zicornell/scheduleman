@@ -6,7 +6,7 @@ This is a docker-based distributed task scheduler in NodeJs and Tyepscript.
 
 ### Project Specifications
 
-* Each task executes within 10 seconds of its scheduled time.
+* Each task executes within (plus or minus) 10 seconds of its scheduled time.
 * Schedules are set by:
   - Cron notation,
   - Schedule date and time,
@@ -34,6 +34,8 @@ There are some additional constraints on tasks themselves.
 * Task result tracking.
 * Strict task initiation tracking.
 * Custom metric tracking for better Auto-Scale Group management.
+* UI: Include "Next Execution" in Schedule List.
+* Trigger template support.
 
 ## Design
 
@@ -53,7 +55,9 @@ There are some additional constraints on tasks themselves.
   Argo, Airflow, etc).
 * The Task Pretender is a simple mock service to pretend it's doing work.
 
-## Proof of Concept
+## Points of Concern
+
+### Proof of Concept
 
 To prove out the pattern described in this design, a few shortcuts and simplifications have been 
 made:
@@ -61,6 +65,24 @@ made:
   pattern and be subject to the same constraints. 
 * To keep this PoC self-contained, a light-weight `postgresql` instance is included.  Don't expect 
   data to be persisted on shutdown
-* An owner id for each schedule could be useful, depending on where this would get used.  That's 
-  not included in this PoC, but is called out where it could be.
+* Additional association fields for each schedule, such as a calendar id, an owner email address, 
+  etc, could be useful, depending on where this would get used.  That's not included in this PoC, 
+  but is called out where it could be.
+* The list of schedules does not support pagination.  If it gets too big, something might 
+  blobglobblerg.
+
+### Cost Analysis
+
+### Error Handling
+
+### Robustness & Resilience
+
+### Dependency Choices
+
+* ORM
+
+* DB
+
+* Parsers
+
 
