@@ -5,7 +5,7 @@ import {ScheduleType} from 'scheduler-common-sdk/src/entities/Schedule';
 
 export default function CreateSchedule() {
   return (
-      <ScheduleForm action="http://localhost:5000/schedules" method="POST"
+      <ScheduleForm action={`${process.env.API_URL}/schedules`} method="POST"
           submitLabel="Create Schedule"
           schedule={{
             scheduleType: ScheduleType.RUNAT,

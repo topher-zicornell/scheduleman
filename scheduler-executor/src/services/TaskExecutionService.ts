@@ -64,6 +64,7 @@ export default class TaskExecutionService {
     // Figure out the time-boundaries for executable tasks
     const timeoutAt = new Date(Date.now() - this.timeoutMillis);
     const executeAt = new Date(Date.now() - this.toleranceMillis);
+    console.log(`Checking for tasks to run: [ timeoutAt ${timeoutAt} ] [ executeAt ${executeAt} ]`);
 
     // See if we have any tasks to execute
     const task = await this.nextExecutionDao.findToExecute(timeoutAt, executeAt);
@@ -82,6 +83,8 @@ export default class TaskExecutionService {
    *    The full schedule record of the task to be executed.
    */
   async executeTask(schedule: Schedule): Promise<void> {
+    console.log(`Executing task ${schedule.scheduleId}`);
+
     // Initiate the task
     await fetch(schedule.actionUrl, {
       method: 'POST',
@@ -92,8 +95,8 @@ export default class TaskExecutionService {
     if (schedule.scheduleType == ScheduleType.RUNON) {
       const nextRunDate = this.rescheduler.determineNextDate(schedule.scheduleType,
           schedule.scheduleDetail);
-      if (nextRunDate) {
-        await this.nextExecutionDao.updateNextExecution(nextRunDate, schedule);
+      if (nextRunDate && schedule.scheduleId) {
+        await this.nextExecutionDao.updateNextExecution(nextRunDate, schedule.scheduleId);
       }
     }
   }

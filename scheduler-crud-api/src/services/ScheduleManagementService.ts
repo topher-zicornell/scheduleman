@@ -1,4 +1,4 @@
-import Schedule from 'scheduler-common-sdk/src/entities/Schedule';
+import Schedule, {ScheduleType} from 'scheduler-common-sdk/src/entities/Schedule';
 import TypedRequestBody from '../utils/TypedRequestBody';
 import TypedResponse from '../utils/TypedResponse';
 import TypedRequestQuery from '../utils/TypedRequestQuery';
@@ -55,16 +55,20 @@ export default class ScheduleManagementService {
    */
   async createSchedule(request: TypedRequestBody<Schedule>,
       response: TypedResponse<Schedule>) {
+    const body = request.body;
+    body.scheduleType = Number(body.scheduleType);
+
     // Figure out the next execution
-    const nextRunDate = this.rescheduler.determineNextDate(request.body.scheduleType,
-        request.body.scheduleDetail);
+    console.log('createSchedule');
+    console.log(`request: ${JSON.stringify(body)}`);
+    const nextRunDate = this.rescheduler.determineNextDate(body.scheduleType, body.scheduleDetail);
 
     // Shove the schedule into the DB
-    const schedule = await this.scheduleDao.insertSchedule(request.body);
+    const schedule = await this.scheduleDao.insertSchedule(body);
 
     // Shove the next execution into the DB
-    if (nextRunDate) {
-      await this.nextExecutionDao.insertNextExecution(nextRunDate, schedule);
+    if (nextRunDate && schedule.scheduleId) {
+      await this.nextExecutionDao.insertNextExecution(nextRunDate, schedule.scheduleId);
     }
 
     return schedule;
@@ -81,8 +85,10 @@ export default class ScheduleManagementService {
    */
   async getSchedule(request: TypedRequestParams<SchedulePathParams>,
       response: TypedResponse<Schedule>) {
+    const params = request.params;
+
     // Look up the schedule from the DB by its id
-    return await this.scheduleDao.getSchedule(request.params.scheduleId);
+    return await this.scheduleDao.getSchedule(params.scheduleId);
   }
 
   /**
@@ -113,18 +119,30 @@ export default class ScheduleManagementService {
    */
   async updateSchedule(request: TypedRequestParamsBody<SchedulePathParams, Schedule>,
       response: TypedResponse<Schedule>) {
+    const body = request.body;
+    const params = request.params;
+    body.scheduleType = Number(body.scheduleType);
+    console.log('updateSchedule');
+    console.log(`request: ${JSON.stringify(body)}`);
+    console.log(`params: ${JSON.stringify(params)}`);
+
     // Figure out the next execution
-    const nextRunDate = this.rescheduler.determineNextDate(request.body.scheduleType,
-        request.body.scheduleDetail);
+    const nextRunDate = this.rescheduler.determineNextDate(body.scheduleType,
+        body.scheduleDetail);
 
     // Update the schedule into the DB
-    const schedule = await this.scheduleDao.updateSchedule(request.params.scheduleId, request.body);
+    const schedule = await this.scheduleDao.updateSchedule(params.scheduleId, {
+      scheduleType: body.scheduleType,
+      scheduleDetail: body.scheduleDetail,
+      actionUrl: body.actionUrl,
+      actionBody: body.actionBody,
+    });
 
     // Update the next execution into the DB
     if (nextRunDate) {
-      await this.nextExecutionDao.updateNextExecution(nextRunDate, schedule);
+      await this.nextExecutionDao.updateNextExecution(nextRunDate, params.scheduleId);
     } else {
-      await this.nextExecutionDao.clearNextExecution(request.params.scheduleId);
+      await this.nextExecutionDao.clearNextExecution(params.scheduleId);
     }
 
     return schedule;
@@ -141,10 +159,12 @@ export default class ScheduleManagementService {
    */
   async deleteSchedule(request: TypedRequestParams<SchedulePathParams>,
       response: TypedResponse<Schedule>) {
+    const params = request.params;
+
     // Remove the next execution
-    await this.nextExecutionDao.clearNextExecution(request.params.scheduleId);
+    await this.nextExecutionDao.clearNextExecution(params.scheduleId);
 
     // Remove the schedule with the given id from the DB
-    await this.scheduleDao.deleteSchedule(request.params.scheduleId);
+    return await this.scheduleDao.deleteSchedule(params.scheduleId);
   }
 }

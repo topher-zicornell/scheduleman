@@ -8,7 +8,10 @@
     "clean": "npx tsc --build --clean",
     "refresh": "npm run clean; rm -rf package-lock.json node_modules; npm i",
     "start": "npx ts-node src/main.ts",
-    "test": "npx mocha 'tests/**/*.spec.js'"
+    "test": "npx mocha 'tests/**/*.spec.js'",
+    "prepackage": "npm run build",
+    "package": "docker build .. -f Dockerfile -t scheduler-waitecho:demo && docker create --name waitecho --network scheduler_net -p 5003:5003 scheduler-waitecho:demo",
+    "run": "docker start waitecho"
   },
   "dependencies": {
     "express": "^4.19.2",

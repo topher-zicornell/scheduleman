@@ -46,7 +46,7 @@ export default class ScheduleDao extends DaoService {
     const QUERY_SQL = `SELECT 
         schedule_id, action_url, action_body, schedule_type, schedule_detail 
         FROM schedule WHERE schedule_id=:scheduleId`;
-    const queryResponse = await this.query(QUERY_SQL, { schedule_id: scheduleId });
+    const queryResponse = await this.query(QUERY_SQL, { scheduleId: scheduleId });
     if (queryResponse.rowCount != 1) {
       throw new ScheduleException(`The given schedule could not be queried`);
     }
@@ -54,18 +54,23 @@ export default class ScheduleDao extends DaoService {
   }
 
   async listSchedules(): Promise<Schedule[]> {
+    console.log('listSchedules');
     const QUERY_SQL = `SELECT
         schedule_id, action_url, action_body, schedule_type, schedule_detail 
         FROM schedule`;
     const queryResponse = await this.query(QUERY_SQL, {});
-    return queryResponse.rows.map((row) => (this.rowToSchedule(row)));
+    console.log(`listSchedules: ${queryResponse.rowCount} rows read`);
+    if (queryResponse.rows) {
+      return queryResponse.rows.map((row) => (this.rowToSchedule(row)));
+    }
+    return [];
   }
 
   async deleteSchedule(scheduleId: string): Promise<Schedule> {
     const DELETE_SQL = `DELETE FROM schedule 
        WHERE schedule_id=:scheduleId
        RETURNING schedule_id, action_url, action_body, schedule_type, schedule_detail`;
-    const deleteResponse = await this.query(DELETE_SQL, { schedule_id: scheduleId });
+    const deleteResponse = await this.query(DELETE_SQL, { scheduleId: scheduleId });
     if (deleteResponse.rowCount != 1) {
       throw new ScheduleException(`The given schedule could not be found to be deleted`);
     }
@@ -76,9 +81,9 @@ export default class ScheduleDao extends DaoService {
     return {
       scheduleId: row.schedule_id,
       actionUrl: row.action_url,
-      actionBody: row.actionBody,
+      actionBody: row.action_body,
       scheduleType: row.schedule_type,
-      scheduleDetail: row.scheduleDetail,
+      scheduleDetail: row.schedule_detail,
     };
   }
 }

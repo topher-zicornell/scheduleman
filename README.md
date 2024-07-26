@@ -77,12 +77,44 @@ made:
 
 ### Robustness & Resilience
 
-### Dependency Choices
+### Solution Choices
+
+* File-based Local Module
 
 * ORM
 
 * DB
 
+* Dates, Time Zones and Epoch Time
+
 * Parsers
 
+* Logging
 
+* Xephyrus
+
+## Build & Execute
+
+The code is separated into the individual components identified by the design.  They're like this:
+
+* `scheduler-storage` contains the database setup stuff.
+* `scheduler-crud-api` contains the schedule CRUD REST API.
+* `scheduler-executor` contains the scheduler itself.
+* `scheduler-ui` contains the React/NextJs UI.
+* `scheduler-waitecho` contains a simple echo API which pretends it's triggering a job.
+
+Every component except `scheduler-storage` uses `npm` to fulfill its build needs.
+* `npm i` installs dependencies.
+* `npm run build` compiles (transpiles) the code.
+* `npm run package` builds _and creates_ the docker image and container for that component.
+* `npm run run` executes the docker container (assuming it's already been built).
+
+There is a `pre*` scripts set up for the package, but not the run.  So if you just do 
+`npm i && npm run package` it will also run `npm run build` first.  Then run `npm run run` to 
+execute it.
+
+For `scheduler-storage` instead of `npm` there is a `build.sh` script.  It takes a single command
+as an argument, which is `package` or `run`.  Again, `run` will do a `package` first if needed.
+
+The only order **required** is that `scheduler-storage` must be started first.  It starts the 
+docker network that all the components share.

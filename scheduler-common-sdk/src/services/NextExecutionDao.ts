@@ -1,5 +1,4 @@
 import DaoService, {DaoIoC} from './DaoService';
-import Schedule from '../entities/Schedule';
 import NextExecution from '../entities/NextExecution';
 
 export interface NextExecutionDaoIoc extends DaoIoC {
@@ -11,17 +10,17 @@ export default class NextExecutionDao extends DaoService {
     super(ioc);
   }
 
-  async insertNextExecution(executeAt: Date, schedule: Schedule): Promise<void> {
+  async insertNextExecution(executeAt: Date, scheduleId: string): Promise<void> {
     const INSERT_SQL = `INSERT INTO next_execution 
         (schedule_id, execute_at) values (:scheduleId, :executeAt)`;
     await this.query(INSERT_SQL, {
-      scheduleId: schedule.scheduleId,
+      scheduleId: scheduleId,
       executeAt: executeAt,
     });
   }
 
-  async updateNextExecution(executeAt: Date, schedule: Schedule): Promise<void> {
-    const nextExecution = await this.findNextExecution(schedule.scheduleId || '');
+  async updateNextExecution(executeAt: Date, scheduleId: string): Promise<void> {
+    const nextExecution = await this.findNextExecution(scheduleId || '');
     if (nextExecution) {
       const UPDATE_QUERY = `UPDATE next_execution 
         SET execute_at=:executeAt 
@@ -31,7 +30,7 @@ export default class NextExecutionDao extends DaoService {
         executionId: nextExecution.executionId
       })
     } else {
-      await this.insertNextExecution(executeAt, schedule);
+      await this.insertNextExecution(executeAt, scheduleId);
     }
   }
 
@@ -65,10 +64,12 @@ export default class NextExecutionDao extends DaoService {
         try_count=try_count + 1
         WHERE execution_id=(
           SELECT execution_id FROM next_execution 
-          WHERE (started_at < :timedoutAt) OR (execute_at < :executeAt AND started_at IS NULL)
+          WHERE 
+            (started_at < :timedoutAt) OR 
+            (execute_at < :executeAt AND started_at IS NULL)
           ORDER BY execute_at LIMIT 1
         )
-        RETURNING execution_id, schedule_id, execute_at, started_at, retry_count`;
+        RETURNING execution_id, schedule_id, execute_at, started_at, try_count`;
     const queryResponse = await this.query(QUERY_SQL, {
       timedoutAt: timedoutAt,
       executeAt: executeAt,

@@ -27,11 +27,12 @@ class Main {
 
   async nap(min: number, max: number) {
     const timeToSleep = Math.floor(Math.random() * (max - min)) + min;
+    console.log(`Sleeping for ${timeToSleep} millis`);
     // O.o what year is it???
     await new Promise(resolve => setTimeout(resolve, timeToSleep));
   }
 
-  async main() {
+  async execute() {
     // Run Fow-eh-vaaaw
     while (true) {
       try {
@@ -52,4 +53,8 @@ class Main {
   }
 }
 
-new Main().main();
+try {
+  new Main().execute();
+} catch (err) {
+  console.error(`CATASTROPHIC FAILURE: ${err}`);
+}

@@ -3,10 +3,13 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "NODE_OPTIONS='--inspect' next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "prepackage": "npm run build",
+    "package": "docker build .. -f Dockerfile -t scheduler-ui:demo && docker create --name ui --network scheduler_net -p 3000:3000 scheduler-ui:demo",
+    "run": "docker start ui"
   },
   "dependencies": {
     "@tailwindcss/forms": "^0.5.7",

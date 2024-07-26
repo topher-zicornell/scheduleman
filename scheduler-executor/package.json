@@ -8,7 +8,10 @@
     "clean": "npx tsc --build --clean",
     "refresh": "npm run clean; rm -rf package-lock.json node_modules; npm i",
     "start": "npx ts-node src/main.ts",
-    "test": "npx mocha 'tests/**/*.spec.js'"
+    "test": "npx mocha 'tests/**/*.spec.js'",
+    "prepackage": "npm run build",
+    "package": "docker build .. -f Dockerfile -t scheduler-executor:demo && docker create --name executor --network scheduler_net scheduler-executor:demo",
+    "run": "docker start executor"
   },
   "dependencies": {
     "express": "^4.19.2",

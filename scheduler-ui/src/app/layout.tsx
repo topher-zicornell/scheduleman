@@ -5,8 +5,8 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Six Data User Console",
-  description: "User Console for the Six Data system",
+  title: "Scheduleman Console",
+  description: "User Console for the Scheduleman system",
 };
 
 export default function RootLayout({

@@ -7,13 +7,13 @@ import Link from 'next/link';
 import IconEdit from '@/app/components/icons/IconEdit';
 import IconTrashFill from '@/app/components/icons/IconTrashFill';
 import ScheduleCard from '@/app/components/ScheduleCard';
-import {useRouter} from 'next/router';
+import {useSearchParams} from 'next/navigation';
 
 function ViewScheduleData(props: { schedule: Schedule }) {
   return (
       <div className="overflow-x-auto">
         <ScheduleCard schedule={props.schedule} />
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto text-2xl">
           <Link href={{
             pathname: `/schedules/update`,
             query: {
@@ -36,8 +36,9 @@ function ViewScheduleData(props: { schedule: Schedule }) {
 }
 
 export default function ViewSchedule() {
-  const router = useRouter();
-  const { scheduleId } = router.query;
+  const params = useSearchParams();
+  const scheduleId = params.get('scheduleId');
+
   const [schedule, setSchedule] = useState<Schedule>({
     scheduleType: ScheduleType.RUNAT,
     scheduleDetail: '',
@@ -46,13 +47,13 @@ export default function ViewSchedule() {
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    fetch(`http://localhost:5000/schedules/${scheduleId}`).
+    fetch(`${process.env.API_URL}/schedules/${scheduleId}`).
     then(response => response.json()).
     then(data => {
       setSchedule(data);
       setLoading(false);
     });
-  });
+  }, []);
 
   if (loading) {
     return (<LoadingComponent/>);

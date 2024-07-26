@@ -4,18 +4,19 @@ import {useEffect, useState} from 'react';
 import LoadingComponent from '@/app/components/LoadingComponent';
 import Schedule, {ScheduleType} from 'scheduler-common-sdk/src/entities/Schedule';
 import ScheduleForm from '@/app/components/ScheduleForm';
-import {useRouter} from 'next/router';
+import {useSearchParams} from 'next/navigation';
 
 export default function UpdateSchedule() {
-  const router = useRouter();
-  const { scheduleId } = router.query;
+  const params = useSearchParams();
+  const scheduleId = params.get('scheduleId');
+
   const [schedule, setSchedule] = useState<Schedule>({
     scheduleType: ScheduleType.RUNAT,
     scheduleDetail: '',
     actionUrl: '',
   });
   const [loading, setLoading] = useState<boolean>(true);
-  const updateUrl = `http://localhost:5000/schedules/${scheduleId}`;
+  const updateUrl = `${process.env.API_URL}/schedules/${scheduleId}`;
 
   useEffect(() => {
     fetch(updateUrl).
@@ -24,7 +25,7 @@ export default function UpdateSchedule() {
       setSchedule(data);
       setLoading(false);
     });
-  });
+  }, []);
 
   if (loading) {
     return (<LoadingComponent/>);
