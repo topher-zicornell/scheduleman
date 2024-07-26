@@ -86,10 +86,16 @@ export default class TaskExecutionService {
     console.log(`Executing task ${schedule.scheduleId}`);
 
     // Initiate the task
-    await fetch(schedule.actionUrl, {
+    const triggerResponse = await fetch(schedule.actionUrl, {
       method: 'POST',
       body: schedule.actionBody || '',
     });
+    console.log(`Response was ${triggerResponse.status} (${triggerResponse.statusText})`);
+
+    // On success, remove the executed task
+    if (schedule.scheduleId) { // it really isn't possible to be null, but ts-ignore is scary
+      await this.nextExecutionDao.clearNextExecution(schedule.scheduleId);
+    }
 
     // Figure out the next execution, but only for RUNON jobs
     if (schedule.scheduleType == ScheduleType.RUNON) {

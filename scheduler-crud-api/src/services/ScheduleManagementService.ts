@@ -59,8 +59,7 @@ export default class ScheduleManagementService {
     body.scheduleType = Number(body.scheduleType);
 
     // Figure out the next execution
-    console.log('createSchedule');
-    console.log(`request: ${JSON.stringify(body)}`);
+    console.log(`POST /schedules: ${JSON.stringify(body)}`);
     const nextRunDate = this.rescheduler.determineNextDate(body.scheduleType, body.scheduleDetail);
 
     // Shove the schedule into the DB
@@ -86,6 +85,7 @@ export default class ScheduleManagementService {
   async getSchedule(request: TypedRequestParams<SchedulePathParams>,
       response: TypedResponse<Schedule>) {
     const params = request.params;
+    console.log(`GET /schedules/${params.scheduleId}`);
 
     // Look up the schedule from the DB by its id
     return await this.scheduleDao.getSchedule(params.scheduleId);
@@ -104,6 +104,7 @@ export default class ScheduleManagementService {
    */
   async listSchedules(request: TypedRequestQuery<ScheduleQuery>,
       response: TypedResponse<Schedule[]>) {
+    console.log(`GET /schedules`);
     // List all the schedules in the DB that match the query
     return await this.scheduleDao.listSchedules();
   }
@@ -122,9 +123,7 @@ export default class ScheduleManagementService {
     const body = request.body;
     const params = request.params;
     body.scheduleType = Number(body.scheduleType);
-    console.log('updateSchedule');
-    console.log(`request: ${JSON.stringify(body)}`);
-    console.log(`params: ${JSON.stringify(params)}`);
+    console.log(`PUT /schedules/${params.scheduleId}: ${JSON.stringify(body)}`);
 
     // Figure out the next execution
     const nextRunDate = this.rescheduler.determineNextDate(body.scheduleType,
@@ -160,6 +159,7 @@ export default class ScheduleManagementService {
   async deleteSchedule(request: TypedRequestParams<SchedulePathParams>,
       response: TypedResponse<Schedule>) {
     const params = request.params;
+    console.log(`DELETE /schedules/${params.scheduleId}`);
 
     // Remove the next execution
     await this.nextExecutionDao.clearNextExecution(params.scheduleId);

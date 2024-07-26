@@ -26,6 +26,18 @@ export default function ScheduleForm(props: { schedule: Schedule, action: string
     router.push('/schedules');
   }
 
+  const determineScheduleTypeTip = (scheduleType: ScheduleType): string => {
+    switch (scheduleType) {
+      case ScheduleType.RUNAT:
+        return 'Use the format: "Jan 01 2024 10:14:50".  TZ is UTC.';
+      case ScheduleType.RUNIN:
+        return 'Use the format: "15 mins", "2 hours"';
+      case ScheduleType.RUNON:
+        return 'Use standard cron format: secs mins hour dom mon dow'
+    }
+    return '';
+  }
+
   return (
       <div className="space-y-6">
         <label className="form-control w-full max-w-xs">
@@ -52,21 +64,15 @@ export default function ScheduleForm(props: { schedule: Schedule, action: string
           <input name="scheduleDetail" type="text"
               value={scheduleDetail}
               onChange={event => {
-                setScheduleDetail(event.target.value)
+                setScheduleDetail(event.target.value);
+                const element = document.getElementById('scheduleDetailTip');
+                if (element) {
+                  element.textContent = determineScheduleTypeTip(scheduleType);
+                }
               }}
               className="input input-bordered w-full max-w-xs"/>
           <div className="label">
-            <span
-                className={`label-text-alt ${props.schedule.scheduleType == ScheduleType.RUNAT ? '' : 'hidden'}`}>
-              Use the format: "Jan 01 2024 10:14:50"
-            </span>
-            <span
-                className={`label-text-alt ${props.schedule.scheduleType == ScheduleType.RUNIN ? '' : 'hidden'}`}>
-              Use the format: "15 mins", "2 hours"
-            </span>
-            <span
-                className={`label-text-alt ${props.schedule.scheduleType == ScheduleType.RUNON ? '' : 'hidden'}`}>
-              Use standard cron format: secs mins hour dom mon dow
+            <span id="scheduleDetailTip" className={`label-text-alt`}>
             </span>
           </div>
         </label>

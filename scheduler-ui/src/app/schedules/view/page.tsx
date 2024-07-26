@@ -9,9 +9,10 @@ import IconTrashFill from '@/app/components/icons/IconTrashFill';
 import ScheduleCard from '@/app/components/ScheduleCard';
 import {useSearchParams} from 'next/navigation';
 
+/** The component for showing schedule data once it's been loaded. */
 function ViewScheduleData(props: { schedule: Schedule }) {
   return (
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto text-2xl">
         <ScheduleCard schedule={props.schedule} />
         <div className="overflow-x-auto text-2xl">
           <Link href={{
@@ -35,6 +36,9 @@ function ViewScheduleData(props: { schedule: Schedule }) {
   )
 }
 
+/**
+ * The page showing a given schedule, indicated by a query parameter.
+ */
 export default function ViewSchedule() {
   const params = useSearchParams();
   const scheduleId = params.get('scheduleId');

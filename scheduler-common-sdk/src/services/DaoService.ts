@@ -27,12 +27,28 @@ export interface DaoIoC {
  * this PoC, simplicity is still possible.
  */
 export default class DaoService {
+  /** The DB connection pool. */
   db: Pool;
 
+  /**
+   * Create a new one of these with the given service configurations.
+   *
+   * @param ioc
+   *    The Inversion of Control services to inject into this service.
+   */
   constructor(ioc: DaoIoC = {}) {
     this.db = ioc.db || new Pool();
   }
 
+  /**
+   * Executes the given query or statement through the connection pool, parsing in named
+   * parameters.
+   *
+   * @param queryStr
+   *    The query or statement to execute.
+   * @param queryParams
+   *    A map of the parameters to bind to the query or statement.
+   */
   async query(queryStr: string, queryParams: QueryParams): Promise<QueryResult> {
     return await this.db.query(yesql.pg(queryStr, YesqlConfig)(queryParams));
   }

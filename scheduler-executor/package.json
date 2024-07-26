@@ -10,8 +10,9 @@
     "start": "npx ts-node src/main.ts",
     "test": "npx mocha 'tests/**/*.spec.js'",
     "prepackage": "npm run build",
-    "package": "docker build .. -f Dockerfile -t scheduler-executor:demo && docker create --name executor --network scheduler_net scheduler-executor:demo",
-    "run": "docker start executor"
+    "package": "docker build .. -f Dockerfile -t scheduler-executor:demo && docker create --name executor0 --network scheduler_net scheduler-executor:demo",
+    "another": "docker create --name executor${N:-1} --network scheduler_net scheduler-executor:demo",
+    "run": "docker start executor${N:-0}"
   },
   "dependencies": {
     "express": "^4.19.2",

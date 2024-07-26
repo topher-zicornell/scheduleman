@@ -6,9 +6,9 @@ import IconEdit from '@/app/components/icons/IconEdit';
 import IconTrashFill from '@/app/components/icons/IconTrashFill';
 import Schedule, {ScheduleType} from 'scheduler-common-sdk/src/entities/Schedule';
 import {useEffect, useState} from 'react';
-import LoadingComponent from '@/app/components/LoadingComponent';
 import IconCalendarPlus from '@/app/components/icons/IconCalendarPlus';
 
+/** A component wrap for schedule ids. */
 function ViewScheduleId(props: { scheduleId: string }) {
   return (
       <div className="overflow-x-auto">
@@ -17,6 +17,7 @@ function ViewScheduleId(props: { scheduleId: string }) {
   );
 }
 
+/** A component wrap for schedule types. */
 function ViewScheduleType(props: { scheduleType: string }) {
   return (
       <div className="overflow-x-auto">
@@ -25,6 +26,7 @@ function ViewScheduleType(props: { scheduleType: string }) {
   );
 }
 
+/** A component wrap for schedule details. */
 function ViewScheduleDetails(props: { scheduleDetails: string }) {
   return (
       <div className="overflow-x-auto">
@@ -34,6 +36,7 @@ function ViewScheduleDetails(props: { scheduleDetails: string }) {
   );
 }
 
+/** A component wrap for action urls. */
 function ViewActionUrl(props: { actionUrl: string }) {
   return (
       <div className="overflow-x-auto">
@@ -42,6 +45,7 @@ function ViewActionUrl(props: { actionUrl: string }) {
   );
 }
 
+/** A component wrap for action bodies. */
 function ViewActionBody(props: { actionBody: string }) {
   return (
       <div className="overflow-x-auto">
@@ -50,9 +54,10 @@ function ViewActionBody(props: { actionBody: string }) {
   );
 }
 
+/** A component wrap for schedule-specific actions. */
 function ActionButtons(props: { scheduleId: string }) {
   return (
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto text-2xl">
         <Link href={{
           pathname: `/schedules/view`,
           query: {
@@ -81,6 +86,7 @@ function ActionButtons(props: { scheduleId: string }) {
   );
 }
 
+/** A handy component for showing a list of schedules. */
 function ScheduleListData(props: { scheduleList: Schedule[] }) {
   return (
       <div className="overflow-x-auto">
@@ -110,15 +116,18 @@ function ScheduleListData(props: { scheduleList: Schedule[] }) {
           }
           </tbody>
         </table>
-        <div className="overflow-x-auto w-10 h-10 flex justify-center">
-          <a href="/schedules/create">
+        <div className="overflow-x-auto w-10 h-10 flex justify-center text-2xl">
+          <Link href="/schedules/create">
             <IconCalendarPlus/>
-          </a>
+          </Link>
         </div>
     </div>
   )
 }
 
+/**
+ * The page showing all the currently defined schedules.
+ */
 export default function SchedulesList() {
   const [schedules, setSchedules] = useState<Schedule[]>([]);
 

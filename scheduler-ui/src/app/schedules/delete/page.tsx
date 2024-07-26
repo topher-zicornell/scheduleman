@@ -6,7 +6,8 @@ import Schedule, {ScheduleType} from 'scheduler-common-sdk/src/entities/Schedule
 import ScheduleCard from '@/app/components/ScheduleCard';
 import {useRouter, useSearchParams} from 'next/navigation';
 
-function ViewScheduleData(props: { schedule: Schedule }) {
+/** The component for confirming the schedule to be deleted. */
+function ConfirmScheduleData(props: { schedule: Schedule }) {
   const router = useRouter();
   const submitter = async () => {
     await fetch(`${process.env.API_URL}/schedules/${props.schedule.scheduleId}`, {
@@ -30,6 +31,10 @@ function ViewScheduleData(props: { schedule: Schedule }) {
       </div>
   )
 }
+
+/**
+ * The page for deleting a schedule, indicated by a query parameter.
+ */
 
 export default function DeleteSchedule() {
   const params = useSearchParams();
@@ -55,5 +60,5 @@ export default function DeleteSchedule() {
   if (loading) {
     return (<LoadingComponent/>);
   }
-  return (<ViewScheduleData schedule={schedule}/>)
+  return (<ConfirmScheduleData schedule={schedule}/>)
 }

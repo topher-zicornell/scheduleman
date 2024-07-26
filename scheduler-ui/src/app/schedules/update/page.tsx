@@ -6,6 +6,9 @@ import Schedule, {ScheduleType} from 'scheduler-common-sdk/src/entities/Schedule
 import ScheduleForm from '@/app/components/ScheduleForm';
 import {useSearchParams} from 'next/navigation';
 
+/**
+ * The page for updating a schedule, indicated by a query parameter.
+ */
 export default function UpdateSchedule() {
   const params = useSearchParams();
   const scheduleId = params.get('scheduleId');
