@@ -34,6 +34,24 @@ can be handled in a number of ways: task idempotency, execution id sentry, repet
 The responsibility for this is downstream from the scheduler and is intimiate to the design of each 
 task.
 
+## Design
+
+### System Design
+
+![System Design Diagram](docs/scheduleman-system-design.drawio.png)
+
+**Notes**
+* Management of schedules is separated from the Scheduler itself.  It can be a "nano-service."
+* The DB can be any platform that can scale vertically & horizontally, can look up records by key,
+  by user, or by time.
+* The Scheduler does not handle execution, only triggering.  (Perhaps it's misnamed.)
+* Any number of Schedulers can be running at the same time.  An Auto-Scaling Group should be used
+  to manage these.
+* Triggering can be done via message queue (Kafka, MQ, SQS, etc), API webhook call, FaaS
+  invocation (AWS Lambda, OpenFaas, etc), or even a workflow invocation (AWS Step Functions,
+  Argo, Airflow, etc).
+* The Task Pretender is a simple mock service to pretend it's doing work.
+
 ### Future Roadmap Considerations
 
 There are a bunch of additional features that become possible once this base system is in place.
@@ -58,23 +76,16 @@ be more effective to track custom metrics like "triggers per minute."
 It'd be really handy to have "next execution" information in the schedule list.  This could also 
 allow filtering out of tasks that have already executed and will not be rescheduled.
 
-## Design
+* UI: Errors.
 
-### System Design
+The UI is good about reporting when it encounters an error, but it is not good about reporting to 
+the user _why_ something failed.  This should be developed out.
 
-![System Design Diagram](docs/scheduleman-system-design.drawio.png)
+* Dead Letters
 
-**Notes**
-* Management of schedules is separated from the Scheduler itself.  It can be a "nano-service."
-* The DB can be any platform that can scale vertically & horizontally, can look up records by key,
-  by user, or by time.
-* The Scheduler does not handle execution, only triggering.  (Perhaps it's misnamed.)
-* Any number of Schedulers can be running at the same time.  An Auto-Scaling Group should be used
-  to manage these.
-* Triggering can be done via message queue (Kafka, MQ, SQS, etc), API webhook call, FaaS 
-  invocation (AWS Lambda, OpenFaas, etc), or even a workflow invocation (AWS Step Functions, 
-  Argo, Airflow, etc).
-* The Task Pretender is a simple mock service to pretend it's doing work.
+If a scheduled job fails to trigger more than the number of times configured, it will be dead.  In 
+this case, updating the schedule will force a reschedule.  This is a great opportunity for future
+development around both monitoring and the UI.
 
 ## Points of Concern
 
@@ -111,6 +122,14 @@ ensures that two nodes querying at the same time cannot grab the same task.
 2. The time-gap in querying for tasks must be randomized.  This ensures that multiple nodes do not
 end up in lock-step with each other, and increases the likelihood for tasks to be picked up by any
 scheduler node.
+
+### Error Cases
+
+An effort was made to make each component self-recover when it encounters an error.  In most cases,
+this seems to recover things fine.  
+
+If a scheduled job fails to trigger more than the number of times configured, it will be dead.  In
+this case, updating the schedule will force a reschedule.
 
 ### Solution Choices
 
@@ -196,7 +215,7 @@ the project root:
 (cd scheduler-ui; npm run package && npm run run)
 ```
 
-To shut it all down (add in any additional:
+To shut it all down (add in any additional `executor` nodes you started):
 ```bash
 docker stop ui waitecho executor0 executor1 crud-api storage
 ```
@@ -209,4 +228,22 @@ docker start ui waitecho executor0 executor1 crud-api storage
 To clean it all up:
 ```bash
 docker remove ui waitecho executor0 executor1 crud-api storage
+```
+
+### Usage
+
+Once everything is deployed and running, you can check logs with:
+```bash
+docker logs -f crud-api
+```
+Substitute the name of the component whose logs you want to watch.
+
+The UI will be at:
+```
+http://localhost:3000/
+```
+
+When you're setting up a schedule, the "Action URL" to use for this PoC will be:
+```
+http://waitecho:5003/echo
 ```
